@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit Complaint</title>
+</head>
+<body>
+<h2>Welcome {{ username }}</h2>
+
+<p>{{ message }}</p>
+
+<form method="POST" enctype="multipart/form-data">
+  <input type="text" name="village_name" placeholder="Enter village name" required><br><br>
+  
+  <label>Complaint Type:</label>
+  <select name="ctype">
+    <option value="text">Text</option>
+    <option value="image">Handwritten Image</option>
+    <option value="audio">Voice</option>
+  </select><br><br>
+
+  <textarea name="complaint_text" placeholder="Enter complaint"></textarea><br><br>
+  <input type="file" name="file"><br><br>
+  
+  <button type="submit">Submit Complaint</button>
+</form>
+</body>
+</html>

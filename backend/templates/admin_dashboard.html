@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>User</th>
+    <th>Village</th>
+    <th>Complaint</th>
+    <th>Type</th>
+    <th>Category</th>
+    <th>Timestamp</th>
+  </tr>
+  {% for c in complaints %}
+  <tr>
+    <td>{{ c[0] }}</td>
+    <td>{{ c[1] }}</td>
+    <td>{{ c[2] }}</td>
+    <td>{{ c[3] }}</td>
+    <td>{{ c[5] }}</td>
+    <td>{{ c[4] }}</td>
+    <td>{{ c[6] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</body>
+</html>
