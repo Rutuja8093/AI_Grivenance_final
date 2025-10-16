@@ -8,3 +8,4 @@ openai-whisper==20250625
 numpy==2.2.6
 scipy==1.15.3
 torch
+gunicorn
