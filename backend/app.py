@@ -118,8 +118,15 @@ def admin_dashboard():
 # -------------------------------
 # Run App
 # -------------------------------
+<<<<<<< HEAD
 if __name__ == "__main__":
     import os
     # Vercel assigns a PORT automatically; fallback to 5000 for local testing
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
+=======
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
+>>>>>>> 7b1c005 (Add vercel.json)
