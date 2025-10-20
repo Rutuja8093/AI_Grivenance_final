@@ -1,9 +1,13 @@
+import os
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
+from flask_cors import CORS
 from nlp import predict_category, extract_text_from_image, transcribe_audio
-import sqlite3, os
 import pandas as pd  # For CSV export
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates", static_folder="static")
+CORS(app)
+
 DB_PATH = "data/complaints.db"
 CSV_PATH = "data/all_complaints.csv"
 
@@ -35,12 +39,15 @@ def init_db():
 def update_csv():
     """Export all complaints to CSV."""
     conn = sqlite3.connect(DB_PATH)
-    df = pd.read_sql_query("SELECT * FROM complaints", conn)
-    conn.close()
-    os.makedirs("data", exist_ok=True)
-    df.to_csv(CSV_PATH, index=False)
-    print("✅ CSV updated")
+    try:
+        df = pd.read_sql_query("SELECT * FROM complaints", conn)
+        os.makedirs("data", exist_ok=True)
+        df.to_csv(CSV_PATH, index=False)
+        print("✅ CSV updated")
+    finally:
+        conn.close()
 
+# Initialize DB once at import (safe)
 init_db()
 
 # -------------------------------
@@ -77,6 +84,7 @@ def complaint_page(username):
         elif ctype in ["image", "audio"]:
             file = request.files.get("file")
             if file:
+                # keep filename safe in production; here keep simple
                 file_path = os.path.join("data", file.filename)
                 file.save(file_path)
                 if ctype == "image":
@@ -93,12 +101,14 @@ def complaint_page(username):
 
         # Insert into DB
         conn = sqlite3.connect(DB_PATH)
-        conn.execute(
-            "INSERT INTO complaints (username, village_name, text, category, type) VALUES (?,?,?,?,?)",
-            (username, village_name, text, category, ctype)
-        )
-        conn.commit()
-        conn.close()
+        try:
+            conn.execute(
+                "INSERT INTO complaints (username, village_name, text, category, type) VALUES (?,?,?,?,?)",
+                (username, village_name, text, category, ctype)
+            )
+            conn.commit()
+        finally:
+            conn.close()
 
         # Update CSV immediately
         update_csv()
@@ -111,22 +121,15 @@ def complaint_page(username):
 @app.route("/admin")
 def admin_dashboard():
     conn = sqlite3.connect(DB_PATH)
-    complaints = conn.execute("SELECT * FROM complaints ORDER BY timestamp DESC").fetchall()
-    conn.close()
+    try:
+        complaints = conn.execute("SELECT * FROM complaints ORDER BY timestamp DESC").fetchall()
+    finally:
+        conn.close()
     return render_template("admin_dashboard.html", complaints=complaints)
 
 # -------------------------------
-# Run App
+# Run App (Render uses PORT env var)
 # -------------------------------
-<<<<<<< HEAD
 if __name__ == "__main__":
-    import os
-    # Vercel assigns a PORT automatically; fallback to 5000 for local testing
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
-=======
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
->>>>>>> 7b1c005 (Add vercel.json)
